@@ -10,13 +10,18 @@ use Illuminate\Support\Facades\Auth;
 
 class ConferenceController extends Controller
 {
-    public function addConference (Request $request){
 
-        $validator = Validator::make($request->all(), [
+    private function validateConference(Request $request){
+
+        return Validator::make($request->all(), [
             'name' => 'required|string|min:10|max:255',
             'description' => 'required|string|max:5000',
             'date' => 'required|date|after_or_equal:today',
         ]);
+    }
+    public function addConference (Request $request){
+
+        $validator = $this->validateConference($request);
 
         if ($validator->fails()) {
             return response()->json(['error'=>$validator->errors()],422);
@@ -38,7 +43,7 @@ class ConferenceController extends Controller
             return response()->json(['message'=>'No conferences found'],404);
         }
 
-        return response()->json($conferences, 202);
+        return response()->json($conferences, 200);
     }
 
     public function getConferenceById($id){
@@ -60,22 +65,17 @@ class ConferenceController extends Controller
             return response()->json(['message'=>'Conference not found'],404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|min:10|max:255',
-            'description' => 'sometimes|string|max:5000',
-            'date' => 'sometimes|date|after_or_equal:today',
-        ]);
+        $validator = $this->validateConference($request);
 
         if ($validator->fails()) {
             return response()->json(['error'=>$validator->errors()],422);
         }
 
         $validated = $validator->validated();
-        $validated['user_id'] = Auth::id();
 
         $conference->update($validated);
 
-        return response()->json(['message'=>'Conference updated successfully',200]);
+        return response()->json(['message'=>'Conference updated successfully'], 200);
     }
 
         public function deleteConferenceById($id){
@@ -88,6 +88,6 @@ class ConferenceController extends Controller
 
         $conference->delete();
 
-        return response()->json(['message'=>'Conference deleted successfully',200]);
+        return response()->json(['message'=>'Conference deleted successfully'], 200);
     }
 }
