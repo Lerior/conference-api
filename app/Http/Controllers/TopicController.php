@@ -91,4 +91,15 @@ class TopicController extends Controller
 
         return response()->json(['message'=>'Topic deleted successfully'],200);
     }
+
+    public function getConferenceTopic ($id) {
+
+        $topic = Topic::with('conference')->find($id);
+
+        if (!$topic) {
+            return response()->json(['message'=>'No register found'],404);
+        }
+
+        return response()->json($topic->conference, 200);
+    }
 }
