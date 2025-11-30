@@ -90,4 +90,15 @@ class ConferenceController extends Controller
 
         return response()->json(['message'=>'Conference deleted successfully'], 200);
     }
+
+    public function getTopicsConference($id){
+        
+        $conference=Conference::with('topics')->find($id);
+
+        if (!$conference) {
+            return response()->json(['message'=>'No registers found'], 404);
+        }
+
+        return response()->json($conference->topics, 200);
+    }
 }
