@@ -101,4 +101,15 @@ class ConferenceController extends Controller
 
         return response()->json($conference->topics, 200);
     }
+
+    public function getConferenceFull($id) {
+
+        $conference = Conference::with(['user', 'topics.user'])->find($id);
+
+        if (!$conference) {
+            return response()->json(['message'=>'Conference not found'],404);
+        }
+
+        return response()->json($conference, 200);
+    }
 }
