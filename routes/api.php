@@ -52,12 +52,12 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::post('attendance', 'addAttendance');
         Route::get('attendance/me','getMyAttendances');
         Route::get('/attendance/{id}/conference','getConferenceAttendancesById');
+        Route::delete('/attendance/{id}', 'deleteAttendanceByid');
 
     });
 
+    //Principal logica sobre editar que solo se le permite al admin
     Route::middleware(IsAdmin::class)->group(function () {
-        
-        //Principal logica sobre editar que solo se le permite al admin
 
         Route::get('topic', [TopicController::class,'getTopics']);
         Route::get('attendance',[AttendanceController::class,'getAttendances']);
