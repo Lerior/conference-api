@@ -9,7 +9,7 @@ class Conference extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['name','description','user_id','date'];
+    protected $fillable = ['title','description','user_id','date'];
 
     public function user () {return $this->belongsTo(User::class);}
 

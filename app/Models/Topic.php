@@ -11,5 +11,6 @@ class Topic extends Model
     protected $fillable = ['title', 'description', 'conference_id', 'user_id','speaker_name'];
 
     public function conference () { return $this->belongsTo(Conference::class);}
-    //public function user () { return $this->belongsTo(User::class);}
+    
+    public function user () { return $this->belongsTo(User::class);}
 }
