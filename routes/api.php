@@ -6,8 +6,6 @@ use App\Http\Controllers\ConferenceController;
 use App\Http\Controllers\TopicController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsUserAuth;
-use App\Models\Conference;
-use App\Models\Topic;
 use Illuminate\Support\Facades\Route;
 
 //PUBLIC ROUTES
@@ -19,7 +17,7 @@ Route::get('/conference/{id}',[ConferenceController::class,'getConferenceById'])
 Route::get('/conference/{id}/topics',[ConferenceController::class,'getTopicsConference']);
 Route::get('/conference/{id}/full',[ConferenceController::class,'getConferenceFull']);
 
-Route::get('/topics/{id}',[TopicController::class,'getTopicById']);
+Route::get('/topic/{id}',[TopicController::class,'getTopicById']);
 
 //PRIVATE ROUTES
 Route::middleware([IsUserAuth::class])->group(function () {
@@ -31,7 +29,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
     
     });
 
-    Route::controller(Conference::class)->group(function () {
+    Route::controller(ConferenceController::class)->group(function () {
 
         Route::post('conference', 'addConference');
         Route::patch('/conference/{id}', 'updateConferenceById');
@@ -39,11 +37,11 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     });
 
-    Route::controller(Topic::class)->group( function () {
+    Route::controller(TopicController::class)->group( function () {
 
         Route::post('topic', 'addTopic');
-        Route::patch('/topics/{id}', 'updateTopicById');
-        Route::delete('/topics/{id}', 'deteTopicById');
+        Route::patch('/topic/{id}', 'updateTopicById');
+        Route::delete('/topic/{id}', 'deleteTopicById');
 
     });
 

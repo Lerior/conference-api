@@ -15,7 +15,7 @@ class ConferenceController extends Controller
     private function validateConference(Request $request){
 
         return Validator::make($request->all(), [
-            'name' => 'required|string|min:10|max:255',
+            'title' => 'required|string|min:10|max:255',
             'description' => 'required|string|max:5000',
             'date' => 'required|date|after_or_equal:today',
         ]);
