@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ConferenceResource;
 use App\Models\Conference;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -110,6 +111,6 @@ class ConferenceController extends Controller
             return response()->json(['message'=>'Conference not found'],404);
         }
 
-        return response()->json($conference, 200);
+        return new ConferenceResource($conference);
     }
 }
