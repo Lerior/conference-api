@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AttendanceResource;
 use App\Models\Attendance;
 use App\Models\Conference;
 use App\Models\User;
@@ -67,13 +68,13 @@ class AttendanceController extends Controller
 
     public function getMyAttendances(){
 
-        $attendances = Auth::user()->attendances()->with('conference')->get();
+        $attendances =  Attendance::with('conference')->get();
 
         if ($attendances->isEmpty()) {
         return response()->json(['message'=>'No attendance found'],404);
     }
 
-        return response()->json($attendances, 200);
+        return AttendanceResource::collection($attendances);
     }
 
     public function getConferenceAttendancesById($id){
