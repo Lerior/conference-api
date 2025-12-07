@@ -11,6 +11,8 @@ class Conference extends Model
     
     protected $fillable = ['title','description','user_id','date'];
 
+    protected $hidden = [ 'created_at','updated_at'];
+
     public function user () {return $this->belongsTo(User::class);}
 
     public function attendances () {return $this->hasMany(Attendance::class);}
