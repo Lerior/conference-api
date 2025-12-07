@@ -68,7 +68,7 @@ class AttendanceController extends Controller
 
     public function getMyAttendances(){
 
-        $attendances =  Attendance::with('conference')->get();
+        $attendances =  Attendance::where('user_id', Auth::id())->with('conference')->get();
 
         if ($attendances->isEmpty()) {
         return response()->json(['message'=>'No attendance found'],404);
