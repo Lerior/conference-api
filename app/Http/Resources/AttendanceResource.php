@@ -16,6 +16,7 @@ class AttendanceResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'conference_id' => $this->conference_id,
             'conference' => $this->conference->title
         ];
     }
