@@ -41,7 +41,7 @@ class ConferenceController extends Controller
         $conferences = Conference::all();
 
         if ($conferences->isEmpty()) {
-            return response()->json(['message'=>'No conferences found'],404);
+            return response()->json(['message'=>'No conferences found'],200);
         }
 
         return response()->json($conferences, 200);
