@@ -47,6 +47,17 @@ class ConferenceController extends Controller
         return response()->json($conferences, 200);
     }
 
+    public function getMyConferences(){
+
+        $conferences = Conference::where('user_id', Auth::id())->get();
+
+        if ($conferences->isEmpty()) {
+            return response()->json(['message'=>'No conferences found'],200);
+        }
+
+        return response()->json($conferences,200);
+    }
+
     public function getConferenceById($id){
 
         $conference=Conference::find($id);

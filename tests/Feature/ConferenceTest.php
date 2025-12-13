@@ -122,6 +122,46 @@ class ConferenceTest extends TestCase
         ]);
     }
 
+    public function test_user_can_get_my_conferences(){
+
+        $user = User::factory()->create();
+
+        Conference::create([
+            'title' => 'Mia 1',
+            'description' => 'Desc 1',
+            'date' => '2026-03-02',
+            'user_id' => $user->id,
+        ]);
+
+        Conference::create([
+            'title' => 'Mia 2',
+            'description' => 'Desc 2',
+            'date' => '2026-03-03',
+            'user_id' => $user->id,
+        ]);
+
+        Conference::create([
+            'title' => 'No es mia',
+            'description' => 'Otra',
+            'date' => '2026-03-04',
+            'user_id' => User::factory()->create()->id,
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/api/my-conferences");
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(2);
+        $response->assertJsonFragment(['title' => 'Mia 1']);
+        $response->assertJsonFragment(['title' => 'Mia 2']);
+    }
+
+    public function test_guest_cannot_get_my_conferences(){
+        
+        $response = $this->getJson("/api/my-conferences");
+
+        $response->assertStatus(401);
+    }
+
     public function test_owner_can_update_conference(){
 
         $user = User::factory()->create();

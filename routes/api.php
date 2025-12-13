@@ -31,6 +31,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     Route::controller(ConferenceController::class)->group(function () {
 
+        Route::get('my-conferences', 'getMyConferences');
         Route::post('conference', 'addConference');
         Route::patch('/conference/{id}', 'updateConferenceById');
         Route::delete('/conference/{id}', 'deleteConferenceById');
