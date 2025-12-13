@@ -111,7 +111,7 @@ class ConferenceTest extends TestCase
         ]);
     }
 
-        public function test_get_conference_by_id_returns_404_when_not_found(){
+    public function test_get_conference_by_id_returns_404_when_not_found(){
 
         $response = $this->get('/api/conference/999999');
 
@@ -149,7 +149,6 @@ class ConferenceTest extends TestCase
         ]);
     }
 
-
     public function test_non_owner_cannot_update_conference(){
 
         $owner = User::factory()->create();
@@ -176,6 +175,78 @@ class ConferenceTest extends TestCase
         $this->assertDatabaseHas('conferences',[
             'id' => $conference->id,
             'title' => 'Titulo original',
+        ]);
+    }
+
+    public function test_owner_can_delete_conference(){
+
+        $user = User::factory()->create();
+
+        $conference = Conference::create([
+            'title' => 'Conferencia a eliminar',
+            'description' => 'Descripcion',
+            'date' => '2026-03-02',
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->actingAs($user)->deleteJson("/api/conference/{$conference->id}");
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseMissing('conferences', [
+            'id' => $conference->id,
+        ]);
+    }
+
+    public function test_guest_cannot_delete_conference(){
+
+        $conference = Conference::create([
+            'title' => 'Conferencia',        
+            'description' => 'Descripcion',        
+            'date' => '2026-03-02',        
+            'user_id' => User::factory()->create()->id,        
+        ]);
+
+        $response = $this->deleteJson("/api/conference/{$conference->id}");
+
+        $response->assertStatus(401);
+
+        $this->assertDatabaseHas('conferences',[
+            'id' => $conference->id,
+        ]);
+    }
+
+    public function test_non_owner_cannot_delete_conference(){
+
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $conference = Conference::create([
+            'title' => 'Conferencia',
+            'desccription' => 'Descripcion',
+            'date' => '2026-03-02',
+            'user_id' => $owner->id,
+        ]);
+
+        $response = $this->actingAs($otherUser)->deleteJson("/api/conference/{$conference->id}");
+
+        $response->assertStatus(403);
+
+        $this->assertDatabaseHas('conferences',[
+            'id' => $conference->id,
+        ]);
+    }
+
+    public function test_delete_conference_returns_404_when_not_found(){
+
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->deleteJson("/api/conference/9999999");
+
+        $response->assertStatus(404);
+
+        $response->assertJson([
+            'message' => 'Conference not found',
         ]);
     }
 }
