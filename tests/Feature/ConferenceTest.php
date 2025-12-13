@@ -223,7 +223,7 @@ class ConferenceTest extends TestCase
 
         $conference = Conference::create([
             'title' => 'Conferencia',
-            'desccription' => 'Descripcion',
+            'description' => 'Descripcion',
             'date' => '2026-03-02',
             'user_id' => $owner->id,
         ]);
