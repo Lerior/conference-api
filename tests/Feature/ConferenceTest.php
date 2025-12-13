@@ -52,6 +52,7 @@ class ConferenceTest extends TestCase
         $response = $this->get('/api/conference');
 
         $response->assertStatus(200);
+
         $response->assertJsonFragment([
             'title' => 'Conferencia existente',
         ]);
@@ -69,6 +70,55 @@ class ConferenceTest extends TestCase
             'title',
             'description',
             'date',
+        ]);
+    }
+
+    public function test_guest_cannot_create_conference(){
+
+        $payload = [
+            'title' => 'Conferencia sin auth',
+            'description' => 'Descripcion sin auth',
+            'date' => '2026-03-02',
+        ];
+
+        $response = $this->postJson('/api/conference', $payload);
+
+        $response->assertStatus(401);
+
+        $this->assertDatabaseMissing('conferences', [
+            'title' => 'Conferencia sin auth',
+        ]);
+    }
+
+    public function test_can_get_conference_by_id(){
+
+        $user = User::factory()->create();
+
+        $conference = Conference::create([
+            'title' => 'Conferencia por ID',
+            'description' => 'Descripcion por ID',
+            'date' => '2026-03-02',
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->get("/api/conference/{$conference->id}");
+
+        $response->assertStatus(200);
+
+        $response->assertJsonFragment([
+            'title' => 'Conferencia por ID',
+            'description' => 'Descripcion por ID',
+        ]);
+    }
+
+        public function test_get_conference_by_id_returns_404_when_not_found(){
+
+        $response = $this->get('/api/conference/999999');
+
+        $response->assertStatus(404);
+
+        $response->assertJson([
+            'message'=>'Conference not found'
         ]);
     }
 }
