@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Conference;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -37,5 +38,22 @@ class ConferenceTest extends TestCase
             'title'=>'Conferencia de prueba'
         ]);
 
+    }
+
+    public function test_conference_list_returns_data(){
+
+        Conference::create([
+            'title' => 'Conferencia existente',
+            'description' => 'Descripcion existente',
+            'date' => '2026-03-02',
+            'user_id' => User::factory()->create()->id,
+        ]);
+
+        $response = $this->get('/api/conference');
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'title' => 'Conferencia existente',
+        ]);
     }
 }
