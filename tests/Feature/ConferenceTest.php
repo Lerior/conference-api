@@ -121,4 +121,61 @@ class ConferenceTest extends TestCase
             'message'=>'Conference not found'
         ]);
     }
+
+    public function test_owner_can_update_conference(){
+
+        $user = User::factory()->create();
+
+        $conference = Conference::create([
+            'title' => 'Titulo original',
+            'description' => 'Descripcion original',
+            'date' => '2026-03-02',
+            'user_id' => $user->id,
+        ]);
+
+        $payload = [
+            'title' => 'Titulo actualizado',
+            'description' => 'Descripcion actualizado',
+            'date' => '2026-04-10',
+        ];
+
+        $response = $this->actingAs($user)->patchJson("/api/conference/{$conference->id}",$payload);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('conferences',[
+            'id' => $conference->id,
+            'title' => 'Titulo actualizado',
+        ]);
+    }
+
+
+    public function test_non_owner_cannot_update_conference(){
+
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $conference = Conference::create([
+            'title' => 'Titulo original',
+            'description' => 'Descripcion original',
+            'date' => '2026-03-02',
+            'user_id' => $owner->id,
+        ]);
+
+
+        $payload = [
+            'title' => 'Intento de hack',
+            'description' => 'No deberia actualizar',
+            'date' => '2026-05-01',
+        ];
+
+        $response = $this->actingAs($otherUser)->patchJson("/api/conference/{$conference->id}",$payload);
+
+        $response->assertStatus(403);
+
+        $this->assertDatabaseHas('conferences',[
+            'id' => $conference->id,
+            'title' => 'Titulo original',
+        ]);
+    }
 }
