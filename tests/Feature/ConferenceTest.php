@@ -56,4 +56,19 @@ class ConferenceTest extends TestCase
             'title' => 'Conferencia existente',
         ]);
     }
+
+    public function test_create_conference_requires_data(){
+
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->postJson('/api/conference', []);
+
+        $response->assertStatus(422);
+
+        $response->assertJsonValidationErrors([
+            'title',
+            'description',
+            'date',
+        ]);
+    }
 }

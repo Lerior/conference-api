@@ -25,7 +25,7 @@ class ConferenceController extends Controller
         $validator = $this->validateConference($request);
 
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()],422);
+            return response()->json(['errors'=>$validator->errors()],422);
         }
 
         $validated = $validator->validated();
