@@ -91,6 +91,10 @@ class ConferenceController extends Controller
             return response()->json(['message'=>'Conference not found'],404);
         }
 
+        if ($conference->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Forbidden'],403);
+        }
+
         $conference->delete();
 
         return response()->json(['message'=>'Conference deleted successfully'], 200);
