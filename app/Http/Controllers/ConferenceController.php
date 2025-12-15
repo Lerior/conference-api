@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreConferenceRequest;
+use App\Http\Requests\UpdateConferenceRequest;
 use App\Http\Resources\ConferenceResource;
 use App\Models\Conference;
 use Illuminate\Http\Request;
@@ -12,26 +14,12 @@ use Illuminate\Support\Facades\Auth;
 class ConferenceController extends Controller
 {
 
-    private function validateConference(Request $request){
+    public function addConference (StoreConferenceRequest $request){
 
-        return Validator::make($request->all(), [
-            'title' => 'required|string|min:10|max:255',
-            'description' => 'required|string|max:5000',
-            'date' => 'required|date|after_or_equal:today',
-        ]);
-    }
-    public function addConference (Request $request){
+        $data = $request->validated();
+        $data['user_id'] = Auth::id();
 
-        $validator = $this->validateConference($request);
-
-        if ($validator->fails()) {
-            return response()->json(['errors'=>$validator->errors()],422);
-        }
-
-        $validated = $validator->validated();
-        $validated['user_id'] = Auth::id();
-
-        Conference::create($validated);
+        Conference::create($data);
 
         return response()->json(['message'=>'Conference created'],201);
     }
@@ -69,7 +57,7 @@ class ConferenceController extends Controller
         return response()->json($conference,200);
     }
 
-    public function updateConferenceById(Request $request, $id) {
+    public function updateConferenceById(UpdateConferenceRequest $request, $id) {
 
         $conference=Conference::find($id);
 
@@ -77,17 +65,8 @@ class ConferenceController extends Controller
             return response()->json(['message'=>'Conference not found'],404);
         }
 
-        $this->authorize('update',$conference);
 
-        $validator = $this->validateConference($request);
-
-        if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()],422);
-        }
-
-        $validated = $validator->validated();
-
-        $conference->update($validated);
+        $conference->update($request->validated());
 
         return response()->json(['message'=>'Conference updated successfully'], 200);
     }
