@@ -77,9 +77,7 @@ class ConferenceController extends Controller
             return response()->json(['message'=>'Conference not found'],404);
         }
 
-        if($conference->user_id !== Auth::id()){
-            return response()->json(['message'=>'Forbidden'],403);
-        }
+        $this->authorize('update',$conference);
 
         $validator = $this->validateConference($request);
 
@@ -102,9 +100,7 @@ class ConferenceController extends Controller
             return response()->json(['message'=>'Conference not found'],404);
         }
 
-        if ($conference->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Forbidden'],403);
-        }
+        $this->authorize('delete', $conference);
 
         $conference->delete();
 
