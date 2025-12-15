@@ -19,7 +19,7 @@ class ConferenceResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'owner' => [                
-                'id' => $this->id,
+                'id' => $this->user->id,
                 'name' => $this->user->name,
             ],
             'topics' => TopicResource::collection($this->topics)
