@@ -150,7 +150,7 @@ class ConferenceTest extends TestCase
         $response = $this->actingAs($user)->getJson("/api/my-conferences");
 
         $response->assertStatus(200);
-        $response->assertJsonCount(2);
+        $response->assertJsonCount(2, 'data');
         $response->assertJsonFragment(['title' => 'Mia 1']);
         $response->assertJsonFragment(['title' => 'Mia 2']);
     }
