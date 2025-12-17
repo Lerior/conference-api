@@ -18,6 +18,7 @@ class ConferenceResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'description' => $this->description,
+            'date' => $this->date,
             'owner' => [                
                 'id' => $this->user->id,
                 'name' => $this->user->name,

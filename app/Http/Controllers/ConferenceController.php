@@ -21,9 +21,9 @@ class ConferenceController extends Controller
         $data = $request->validated();
         $data['user_id'] = Auth::id();
 
-        Conference::create($data);
+        $conference = Conference::create($data);
 
-        return response()->json(['message'=>'Conference created'],201);
+        return new ConferenceListResource($conference->load('user'));
     }
 
     public function getConferences () {
@@ -48,7 +48,7 @@ class ConferenceController extends Controller
             return response()->json(['message'=>'Conference not found'],404);
         }
 
-        return response()->json($conference,200);
+        return response()->json($conference);
     }
 
     public function updateConferenceById(UpdateConferenceRequest $request, $id) {
