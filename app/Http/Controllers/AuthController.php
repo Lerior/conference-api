@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -62,7 +63,7 @@ class AuthController extends Controller
 
     public function getUser(){
         $user = Auth::user();
-        return response()->json([$user],200);
+        return new UserResource($user);
     }
 
     public function logout(){
