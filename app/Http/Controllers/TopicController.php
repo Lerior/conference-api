@@ -4,31 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTopicRequest;
 use App\Http\Requests\UpdateTopicRequest;
+use App\Http\Resources\TopicResource;
+use App\Models\Conference;
 use App\Models\Topic;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class TopicController extends Controller
 {
 
     public function addTopic (StoreTopicRequest $request) {
 
-        $data = $request->validated();
+        $conference = Conference::findOrFail($request->conference_id);
+
+        $this->authorize('create', [Topic::class, $conference]);
         
-        $topic = Topic::create($data);
+        $topic = Topic::create($request->validated());
         
         return response()->json($topic, 201);
     }
 
     public function getTopics (){
         
-        $topics= Topic::all();
-
-        if ($topics->isEmpty()) {
-            return response()->json(['message'=>'Not topics found'], 404);
-        }
-
-        return response()->json($topics, 200);
+      return TopicResource::collection(
+        Topic::with('user')->get()
+      );
     }
 
     public function getTopicById($id){

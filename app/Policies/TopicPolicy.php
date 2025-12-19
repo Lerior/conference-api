@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Topic;
 use App\Models\User;
+use App\Models\Conference;
 use Illuminate\Auth\Access\Response;
 
 class TopicPolicy
@@ -27,9 +28,9 @@ class TopicPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, Conference $conference): bool
     {
-        return true;
+        return $user->id === $conference->user_id;
     }
 
     /**
@@ -45,7 +46,7 @@ class TopicPolicy
      */
     public function delete(User $user, Topic $topic): bool
     {
-        return $user->id === $topic->user_id || $topic->conference->user_id;
+        return $user->id === $topic->user_id || $user->id === $topic->conference->user_id;
     }
 
     /**
