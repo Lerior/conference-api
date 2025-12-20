@@ -87,4 +87,49 @@ class TopicTest extends TestCase
             'title' => 'Titulo actualizado',
         ]);
     }
+
+    public function test_non_owner_cannot_update_conference(){
+
+        $conference = Conference::factory()->create();
+        $randomUser = User::factory()->create();
+
+        $topic = Topic::create([
+            'title' => 'Titulo original',
+            'description' => 'Descripcion original',
+            'conference_id' => $conference->id,
+            'user_id' => User::factory()->create()->id,
+        ]);
+
+        $payload = [
+            'title' => 'Intento ilegal',
+            'descriptio' => 'No autorizado',
+            'conference_id' => $conference->id,
+            'user_id' => User::factory()->create()->id,
+        ];
+
+        $this->actingAs($randomUser)->patchJson("/api/topic/{$topic->id}",$payload)->assertStatus(403);
+
+    }
+
+    public function test_topic_owner_can_update_topic(){
+
+        $user = User::factory()->create();
+        $conference = Conference::factory()->create();
+
+        $topic = Topic::create([
+            'title' => 'Nuevo titulo',
+            'description' => 'Nueva descripcion',
+            'conference_id' => $conference->id,
+            'user_id' => $user->id,
+        ]);
+
+        $payload = [
+            'title' => 'Titulo actualizado',
+            'description' => 'Descripcion actualizada',
+            'conference_id' => $conference->id,
+            'user_id' => $user->id,
+        ];
+
+        $this->actingAs($user)->patchJson("/api/topic/{$topic->id}",$payload)->assertStatus(200);
+    }
 }
