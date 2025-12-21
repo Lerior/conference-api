@@ -132,4 +132,86 @@ class TopicTest extends TestCase
 
         $this->actingAs($user)->patchJson("/api/topic/{$topic->id}",$payload)->assertStatus(200);
     }
+
+    public function test_conference_owner_can_delete_topic(){
+
+        $conference = Conference::factory()->create();
+        $owner = $conference->user;
+
+        $topic = Topic::create([
+            'title' => 'Tiltulo nuevo',
+            'description' => 'Descripcion nueva',
+            'user_id' => User::factory()->create()->id,
+            'conference_id' => $conference->id,
+        ]);
+
+        $this->actingAs($owner)
+        ->deleteJson("/api/topic/{$topic->id}")
+        ->assertStatus(200);
+
+        $this->assertDatabaseMissing('topics', [
+            'id' => $topic->id,
+        ]);
+    }
+
+    public function test_topic_owner_can_delete_topic(){
+
+        $conference = Conference::factory()->create();
+        $topicOwner = User::factory()->create();
+
+        $topic = Topic::create([
+            'title' => 'Nuevo titulo',
+            'description' => 'Nueva descripcion',
+            'conference_id' => $conference->id,
+            'user_id' => $topicOwner->id,
+        ]);
+
+        $this->actingAs($topicOwner)
+        ->deleteJson("/api/topic/{$topic->id}")
+        ->assertStatus(200);
+
+        $this->assertDatabaseMissing('topics', [
+            'id' => $topic->id,
+        ]);
+    }
+
+    public function test_guest_cannot_delete_topic(){
+
+        $conference = Conference::factory()->create();
+
+        $topic = Topic::create([
+            'title' => 'Nuevo titulo',
+            'description' => 'Nueva descripcion',
+            'conference_id' => $conference->id,
+            'user_id' => User::factory()->create()->id,
+        ]);
+
+        $this->deleteJson("/api/topic/{$topic->id}")
+        ->assertStatus(401);
+
+        $this->assertDatabaseHas('topics',[
+            'id' => $topic->id,
+        ]);
+    }
+
+
+    public function test_non_owner_cannot_delete_topic(){
+
+        $conference = Conference::factory()->create();
+        $randomUser= User::factory()->create();
+
+        $topic = Topic::create([
+            'title' => 'Nuevo titulo',
+            'description' => 'Nueva descripcion',
+            'conference_id' => $conference->id,
+            'user_id' => User::factory()->create()->id,
+        ]);
+
+        $this->actingAs($randomUser)->deleteJson("/api/topic/{$topic->id}")
+        ->assertStatus(403);
+
+        $this->assertDatabaseHas('topics',[
+            'id' => $topic->id,
+        ]);
+    }
 }
