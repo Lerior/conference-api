@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Attendance;
 use App\Models\Conference;
 use App\Models\Topic;
+use App\Policies\AttendancePolicy;
 use App\Policies\ConferencePolicy;
 use App\Policies\TopicPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -26,5 +28,6 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Conference::class, ConferencePolicy::class);
         Gate::policy(Topic::class, TopicPolicy::class);
+        Gate::policy(Attendance::class, AttendancePolicy::class);
     }
 }
