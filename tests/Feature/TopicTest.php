@@ -5,10 +5,6 @@ namespace Tests\Feature;
 use App\Models\Conference;
 use App\Models\Topic;
 use App\Models\User;
-use Database\Factories\ConferenceFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class TopicTest extends TestCase
