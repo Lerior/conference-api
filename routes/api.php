@@ -50,7 +50,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
         Route::post('attendance', 'addAttendance');
         Route::get('attendance/me','getMyAttendances');
-        Route::get('/attendance/{id}/conference','getConferenceAttendancesById');
+        Route::get('/attendance/{id}/conference','getConferenceAttendanceById');
         Route::delete('/attendance/{id}', 'deleteAttendanceByid');
 
     });

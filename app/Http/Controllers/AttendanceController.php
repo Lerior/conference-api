@@ -4,23 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAttendanceRequest;
 use App\Http\Resources\AttendanceResource;
+use App\Http\Resources\AttendeeResource;
 use App\Models\Attendance;
 use App\Models\Conference;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class AttendanceController extends Controller
 {
 
-    private function validateAttendance(Request $request){
-        return Validator::make($request->all(),[
-            'conference_id' => 'required|exists:conferences,id',
-        ]);
-
-
-    }
     public function addAttendance (StoreAttendanceRequest $request){
 
         $data = $request->validated();
@@ -50,29 +41,14 @@ class AttendanceController extends Controller
         return response()->json($attendances,200);
     }
 
-    public function getAttendanceById($id){
-
-        $attendance = Attendance::find($id);
-
-        if (!$attendance) {
-            return response()->json(['message'=>'No attendance found'],404);
-        }
-
-        return response()->json($attendance,200);
-    }
-
     public function getMyAttendances(){
 
-        $attendances =  Attendance::where('user_id', Auth::id())->with('conference')->get();
-
-        if ($attendances->isEmpty()) {
-        return response()->json(['message'=>'No attendance found'],404);
+        return AttendanceResource::collection(
+            Attendance::with('user')->where('user_id', Auth::id())->get()
+        );
     }
 
-        return AttendanceResource::collection($attendances);
-    }
-
-    public function getConferenceAttendancesById($id){
+    public function getConferenceAttendanceById($id){
 
         $conference = Conference::with('attendances.user')->find($id);
 
@@ -84,7 +60,9 @@ class AttendanceController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-            return response()->json($conference->attendances, 200);
+            return AttendeeResource::collection(
+                Attendance::with('user')->where('conference_id',$conference->id)->get()
+            );
     }    
 
 
@@ -95,6 +73,8 @@ class AttendanceController extends Controller
         if (!$attendance) {
             return response()->json(['message'=>'No attendance found'],404);
         }
+
+        $this->authorize('delete', $attendance);
 
         $attendance->delete();
 
