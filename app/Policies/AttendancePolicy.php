@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Attendance;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Auth;
 
 class AttendancePolicy
 {
@@ -29,7 +30,7 @@ class AttendancePolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return Auth::check();
     }
 
     /**
