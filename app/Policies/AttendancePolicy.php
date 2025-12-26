@@ -30,7 +30,7 @@ class AttendancePolicy
      */
     public function create(User $user): bool
     {
-        return Auth::check();
+        return true;
     }
 
     /**
