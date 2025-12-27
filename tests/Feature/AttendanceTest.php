@@ -14,6 +14,63 @@ class AttendanceTest extends TestCase
     /**
      * A basic feature test example.
      */
+
+    public function test_user_can_get_attendances(){
+
+        $user = User::factory()->create();
+        $conference1 = Conference::factory()->create();
+        $conference2 = Conference::factory()->create();
+        $conference3 = Conference::factory()->create();
+
+        Attendance::create([
+            'user_id' => $user->id,
+            'conference_id' => $conference1->id,
+        ]);
+        Attendance::create([
+            'user_id' => $user->id,
+            'conference_id' => $conference2->id,
+        ]);
+        Attendance::create([
+            'user_id' => User::factory()->create()->id,
+            'conference_id' => $conference3->id,
+        ]);
+
+        $response = $this->actingAs($user)->getJson('/api/attendance/me');
+        $response->assertStatus(200);
+        $response->assertJsonCount(2,'data');    
+        $response->assertJsonFragment(['conference_id' => $conference1->id]);    
+        $response->assertJsonFragment(['conference_id'=> $conference2->id]);    
+    }
+
+    public function test_conference_owner_can_get_attendances(){
+
+        $conference = Conference::factory()->create();
+        $otherconference = Conference::factory()->create();
+        $owner = $conference->user;
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $user3 = User::factory()->create();
+
+        Attendance::create([
+            'user_id' => $user1->id,
+            'conference_id' => $conference->id,
+        ]);
+        Attendance::create([
+            'user_id' => $user2->id,
+            'conference_id' => $conference->id,
+        ]);
+        Attendance::create([
+            'user_id' => $user3->id,
+            'conference_id' => $otherconference->id,
+        ]);
+
+        $response = $this->actingAs($owner)->getJson("/api/attendance/{$conference->id}/conference");
+        $response->assertStatus(200);
+        $response->assertJsonCount(2,'data');
+        $response->assertJsonFragment(['email' => $user1->email]);
+        $response->assertJsonFragment(['email' => $user2->email]);
+    }
+
     public function test_user_can_create_attendance(): void
     {
         $user = User::factory()->create();
