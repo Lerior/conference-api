@@ -29,7 +29,7 @@ class ConferenceController extends Controller
     public function getConferences () {
 
         return ConferenceListResource::collection(
-            Conference::with('user')->get()
+            Conference::with('user')->paginate(1)
         );
     }
 
