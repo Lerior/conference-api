@@ -26,10 +26,22 @@ class ConferenceController extends Controller
         return new ConferenceListResource($conference->load('user'));
     }
 
-    public function getConferences () {
+    public function getConferences (Request $request) {
+
+        $request->validate([
+            'per_page' => 'integer|min:5|max:50',
+            'order_by' => 'in:date,created_at,title',
+            'order' => 'in:asc,desc',
+        ]);
+
+        $perPage = $request->query('per_page',10);
+        $orderBy = $request->query('order_by','date');
+        $order = $request->query('order','desc');
 
         return ConferenceListResource::collection(
-            Conference::with('user')->paginate(1)
+            Conference::with('user')
+            ->orderBy($orderBy, $order)
+            ->paginate($perPage)
         );
     }
 

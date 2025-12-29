@@ -18,6 +18,7 @@ class ConferenceListResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'date' => $this->date,
+            'created_at' => $this->created_at->toDateTimeString(),
             'owner' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
