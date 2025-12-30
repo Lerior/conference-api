@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FiltersConferenceRequest;
 use App\Http\Requests\StoreConferenceRequest;
 use App\Http\Requests\UpdateConferenceRequest;
 use App\Http\Resources\ConferenceListResource;
@@ -26,20 +27,26 @@ class ConferenceController extends Controller
         return new ConferenceListResource($conference->load('user'));
     }
 
-    public function getConferences (Request $request) {
+    public function getConferences (FiltersConferenceRequest $request) {
 
-        $request->validate([
-            'per_page' => 'integer|min:5|max:50',
-            'order_by' => 'in:date,created_at,title',
-            'order' => 'in:asc,desc',
-        ]);
+        $data = $request->validated();
 
-        $perPage = $request->query('per_page',10);
-        $orderBy = $request->query('order_by','date');
-        $order = $request->query('order','desc');
+        $perPage = $data['per_page'] ?? 10;
+        $orderBy = $data['order_by'] ?? 'date';
+        $order = $data['order'] ?? 'desc';
 
         return ConferenceListResource::collection(
             Conference::with('user')
+            ->when(isset($data['title']), function ($query) use ($data){
+                $query->where('title', 'like', '%'.$data['title']. '%');
+            })
+            ->when(isset($data['first_date']) && isset($data['last_date']), 
+            function ($query) use ($data){
+                $query->whereBetween('date', [
+                    $data['first_date'],
+                    $data['last_date'],
+                ]);
+            })
             ->orderBy($orderBy, $order)
             ->paginate($perPage)
         );
