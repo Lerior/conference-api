@@ -37,16 +37,14 @@ class ConferenceController extends Controller
 
         return ConferenceListResource::collection(
             Conference::with('user')
-            ->when(isset($data['title']), function ($query) use ($data){
-                $query->where('title', 'like', '%'.$data['title']. '%');
-            })
+            ->when(isset($data['title']), 
+            fn ($query) =>
+                $query->title($data['title'])
+                )
             ->when(isset($data['first_date']) && isset($data['last_date']), 
-            function ($query) use ($data){
-                $query->whereBetween('date', [
-                    $data['first_date'],
-                    $data['last_date'],
-                ]);
-            })
+            fn ($query) =>
+                $query->betweenDates($data['first_date'],$data['last_date'])
+                )
             ->orderBy($orderBy, $order)
             ->paginate($perPage)
         );

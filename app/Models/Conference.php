@@ -19,4 +19,12 @@ class Conference extends Model
     public function topics () {return $this->hasMany(Topic::class);}
 
     public function attendees () {return $this->belongsToMany(User::class, 'attendances');}
+
+    public function scopeTitle ($query, $title){
+        return $query->where('title','like', "%{$title}%"); 
+    }
+
+    public function scopeBetweenDates($query, $from, $to){
+        return $query->whereBetween('date', [$from,$to]);
+    }
 }
