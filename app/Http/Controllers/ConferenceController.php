@@ -50,10 +50,28 @@ class ConferenceController extends Controller
         );
     }
 
-    public function getMyConferences(){
+    public function getMyConferences(FiltersConferenceRequest $request){
+
+        $data = $request->validated();
+
+        $perPage = $data['per_page'] ?? 10;
+        $orderBy = $data['order_by'] ?? 'date';
+        $order = $data['order'] ?? 'desc';
+
 
         return ConferenceListResource::collection(
-            Conference::with('user')->where('user_id', Auth::id())->get()
+            Conference::with('user')->where('user_id', Auth::id())
+            ->when(isset($data['title']), 
+            fn ($query) =>
+                $query->title($data['title'])
+                )
+            ->when(isset($data['first_date']) && isset($data['last_date']), 
+            fn ($query) =>
+                $query->betweenDates($data['first_date'],$data['last_date'])
+                )
+            ->orderBy($orderBy, $order)
+            ->paginate($perPage)
+
         );
     }
 
